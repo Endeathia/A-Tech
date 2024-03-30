@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_HUB_REPO = 'Tamer153/Roberta' // My docker Hub
+        DOCKER_HUB_REPO = 'Tamer153/roberta' // My docker Hub
         IMAGE_TAG = "${DOCKER_HUB_REPO}:${BUILD_NUMBER}" // TAG the IMAGE
     }
     stages{
