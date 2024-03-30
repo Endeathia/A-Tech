@@ -11,12 +11,12 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'DockerHub1', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'USER_NAME')]) {
                         sh 'docker login -u ${USER_NAME} -p ${DOCKER_PASSWORD} '
                         if (currentBuild.result == null) {
-                        currentBuild.result = 'SUCCESS'
-                        echo 'Login Successful'
-                    } else {
-                        currentBuild.result = 'FAILURE'
-                        error 'Docker login failed!'
-                    }
+                            currentBuild.result = 'SUCCESS'
+                            echo 'Login Successful'
+                        } else {
+                            currentBuild.result = 'FAILURE'
+                            error 'Docker login failed!'
+                        }
                     }
                 }
             }
@@ -36,11 +36,11 @@ pipeline {
             }
         }
         stage('Trigger Deploy') {
-         steps {
-             build job: 'RobertaDeploy', wait: false, parameters: [
-            string(name: 'ROBERTA_IMAGE_URL', value: "${DOCKER_HUB_REPO}:${BUILD_NUMBER}")
-        ]
-    }
-}
+            steps {
+                build job: 'RobertaDeploy', wait: false, parameters: [
+                    string(name: 'ROBERTA_IMAGE_URL', value: "${DOCKER_HUB_REPO}:${BUILD_NUMBER}")
+                ]
+            }
+        }
     }
 }
