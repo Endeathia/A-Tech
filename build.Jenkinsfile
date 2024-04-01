@@ -42,5 +42,18 @@ pipeline {
                 ]
             }
         }
+    post {
+        always {
+            // Cleanup Docker images
+            script {
+                sh "docker image prune -f"
+            }
+        }
     }
+    stage('Clean WorkSpace'){
+        steps{
+            cleanWs()
+        }
+    }
+}
 }

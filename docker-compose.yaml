@@ -1,0 +1,102 @@
+version: '3'
+services:
+  mongo1:
+    image: mongo
+    container_name: mongo1
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data-1:/data/db
+    networks:
+      - mongo-network
+    command: ["--replSet", "myReplicaSet", "--bind_ip_all"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'myReplicaSet',members:[{_id:0,host:\"mongo1:27017\",priority:1},{_id:1,host:\"mongo2:27017\",priority:0.5},{_id:2,host:\"mongo3:27017\",priority:0.5}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
+
+  mongo2:
+    image: mongo
+    container_name: mongo2  
+    ports:
+     - "27018:27017"
+    volumes:
+      - mongo-data-2:/data/db
+    networks:
+      - mongo-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["--replSet", "myReplicaSet", "--bind_ip_all"]
+
+  mongo3:
+    image: mongo
+    container_name: mongo3
+    ports:
+     - "27019:27017"
+    volumes:
+      - mongo-data-3:/data/db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - mongo-network
+    command: ["--replSet","myReplicaSet", "--bind_ip_all"]
+
+  yolo5:
+    image: tamer153/yolo5:1.0.0
+    container_name: yolo5
+    ports:
+      - "8081:8081"
+    environment:
+      - BUCKET_NAME=tamerawsbucket
+    volumes:
+      - C:\Users\failc\.aws:/root/.aws
+    networks:
+    - mongo-network
+
+  polybot:
+    image: tamer153/polybot:1.0.2
+    container_name: polybot
+    ports:
+      - "8443:8443"
+    environment:
+      - BUCKET_NAME=${BUCKET_NAME}
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN_FILE}
+      - TELEGRAM_APP_URL=https://certain-wombat-fairly.ngrok-free.app
+    secrets:
+      - my_secret
+    depends_on:
+      - ngrok
+    volumes:
+      - C:\Users\failc\.aws:/root/.aws
+    networks:
+    - mongo-network
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok 
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command: ["http", "--domain=${domain}", "polybot:8443"]
+    secrets:
+      - my_secret
+    networks:
+      - mongo-network
+
+networks:
+  mongo-network:
+    driver: bridge
+
+volumes:
+  mongo-data-1:
+  mongo-data-2:
+  mongo-data-3: 
+
+secrets:
+  my_secret:
+    file: .env
+
