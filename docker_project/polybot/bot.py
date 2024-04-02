@@ -89,20 +89,19 @@ class ObjectDetectionBot(Bot):
             # TODO upload the photo to S3
             s3.upload_file(img_path, images_bucket, os.path.basename(img_path))
             #TODO send a request to the `yolo5` service for prediction
-            # Use requests library to send HTTP post request to Yolo5 predict endpoint + extract the base name of the img
             yolo5_response = requests.post(f"http://yolo5:8081/predict?imgName={os.path.basename(img_path)}")
             # TODO send results to the Telegram end-user
             if yolo5_response.status_code == 200:
-                response = yolo5_response.json()['labels'] # This variable decodes the Json output and holds the labels key / Object
+                response = yolo5_response.json()['labels']
                 self.send_text(msg['chat']['id'], "Object detection results:")
                 detected_objects = {}
-                #Loop through response and get hold of the class object that appears in format if it exists then increment it if not then add it.
+
                 for i in response:
                     if i['class'] in detected_objects:
                         detected_objects[i['class']] += 1
                     else:
                         detected_objects[i['class']] = 1
-                #logger.info(detected_objects)
+                logger.info(detected_objects)
                 result = ''
                 for k,v in detected_objects.items():
                     result += f"{k}: {v}\n" 
