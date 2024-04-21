@@ -1,0 +1,13 @@
+[req]
+default_bits       = 2048
+prompt             = no
+default_md         = sha256
+distinguished_name = dn
+
+[dn]
+C  = US
+ST = Unknown
+L  = Brooklyn
+O  = Example=unknown
+OU = Company=Atech
+CN = Tamer-Load-Balancer
