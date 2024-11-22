@@ -1,4 +1,4 @@
-FROM python:3.10.12-slim-bullseye
+FROM python:3.14.0a1-slim-bullseye
 WORKDIR /app
 RUN pip install --upgrade pip
 RUN apt update && apt install git -y
